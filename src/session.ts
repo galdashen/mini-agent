@@ -4,7 +4,7 @@ import { existsSync } from "fs";
 import { homedir } from "os";
 import type { Message } from "./types.ts";
 
-export function getSessionDir(): string {
+function getSessionDir(): string {
   return join(homedir(), ".mini-agent", "sessions");
 }
 

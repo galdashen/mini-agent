@@ -1,15 +1,17 @@
 import { complete } from "./api.ts";
-import { Context, ToolCall, ToolResultMessage } from "./types.ts";
+import { Context, Message, ToolCall, ToolResultMessage } from "./types.ts";
 
 export async function runAgent(
   apiKey: string,
   model: string,
   context: Context,
   executeTool: (call: ToolCall) => Promise<ToolResultMessage>,
-): Promise<Context> {
+): Promise<Message[]> {
+  const newMessages: Message[] = [];
   while (true) {
     const response = await complete(apiKey, model, context);
 
+    newMessages.push(response);
     context.messages.push(response);
 
     if (response.stopReason != "toolUse") {
@@ -34,6 +36,7 @@ export async function runAgent(
             timestamp: Date.now(),
           };
         }
+        newMessages.push(result);
         context.messages.push(result);
       }
     } else {
@@ -41,5 +44,5 @@ export async function runAgent(
     }
   }
 
-  return context;
+  return newMessages;
 }
